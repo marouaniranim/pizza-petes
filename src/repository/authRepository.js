@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const User = require('../model/userModel');
+=======
+const User = require('../model');
+>>>>>>> 7c7574c74a032b5aba05ecb0532be9a9259156be
 
 class AuthRepository {
   async findAll() {

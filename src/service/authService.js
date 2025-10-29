@@ -6,6 +6,7 @@ class AuthService {
     try {
       console.log('📝 Tentative d\'inscription avec:', req.body);
 
+<<<<<<< HEAD
       const { firstName, lastName, email, address, city, state, password, isAdmin } = req.body;
 
       // Vérification si l'utilisateur admin existe déjà (par email)
@@ -57,14 +58,54 @@ class AuthService {
         message: user.isAdmin ? 
           'Administrateur créé avec succès ! 🎉' : 
           'Utilisateur créé avec succès ! 🎉',
+=======
+      const { firstName, lastName, email, address, city, state, password } = req.body;
+
+      // Vérification si l'utilisateur existe déjà
+      const existingUser = await authRepository.findByEmail(email);
+      if (existingUser) {
+        return res.status(409).json({
+          success: false,
+          message: 'Un utilisateur avec cet email existe déjà'
+        });
+      }
+
+      // Création de l'utilisateur
+      const user = await authRepository.create({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.toLowerCase().trim(),
+        address: address.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        password: password
+      });
+
+      // Génération du token
+      const token = generateToken(user._id);
+
+      console.log('🎉 NOUVEL UTILISATEUR INSCRIT:');
+      console.log('📧 Email:', user.email);
+      console.log('👤 Nom:', user.firstName, user.lastName);
+      console.log('🆔 ID:', user._id);
+
+      return res.status(201).json({
+        success: true,
+        message: 'Utilisateur créé avec succès ! 🎉',
+>>>>>>> 7c7574c74a032b5aba05ecb0532be9a9259156be
         user: {
           id: user._id,
           firstName: user.firstName,
           lastName: user.lastName,
+<<<<<<< HEAD
+=======
+          email: user.email,
+>>>>>>> 7c7574c74a032b5aba05ecb0532be9a9259156be
           address: user.address,
           city: user.city,
           state: user.state,
           isAdmin: user.isAdmin
+<<<<<<< HEAD
         }
       };
 
@@ -75,6 +116,11 @@ class AuthService {
       }
 
       return res.status(201).json(response);
+=======
+        },
+        token: token
+      });
+>>>>>>> 7c7574c74a032b5aba05ecb0532be9a9259156be
 
     } catch (error) {
       console.error('❌ Erreur lors de l\'inscription:', error);
@@ -103,6 +149,7 @@ class AuthService {
 
   async login(req, res) {
     try {
+<<<<<<< HEAD
       console.log('🔐 Tentative de connexion admin avec:', req.body.email);
 
       const { email, password } = req.body;
@@ -110,6 +157,15 @@ class AuthService {
       // Recherche de l'administrateur
       const user = await authRepository.findByEmail(email);
       if (!user || !user.isAdmin) {
+=======
+      console.log('🔐 Tentative de connexion avec:', req.body.email);
+
+      const { email, password } = req.body;
+
+      // Recherche de l'utilisateur
+      const user = await authRepository.findByEmail(email);
+      if (!user) {
+>>>>>>> 7c7574c74a032b5aba05ecb0532be9a9259156be
         return res.status(401).json({
           success: false,
           message: 'Email ou mot de passe incorrect'
@@ -128,11 +184,19 @@ class AuthService {
       // Génération du token
       const token = generateToken(user._id);
 
+<<<<<<< HEAD
       console.log('✅ ADMINISTRATEUR CONNECTÉ:', user.email);
 
       return res.json({
         success: true,
         message: 'Connexion administrateur réussie ! 🎉',
+=======
+      console.log('✅ UTILISATEUR CONNECTÉ:', user.email);
+
+      return res.json({
+        success: true,
+        message: 'Connexion réussie ! 🎉',
+>>>>>>> 7c7574c74a032b5aba05ecb0532be9a9259156be
         user: {
           id: user._id,
           firstName: user.firstName,

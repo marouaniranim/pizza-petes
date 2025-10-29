@@ -1,10 +1,15 @@
 const express = require('express');
 const authService = require('../service/authService');
+<<<<<<< HEAD
 const { registerSchema, loginSchema, validateRequest, validateAdminFields } = require('../schema/validationSchema');
+=======
+const { registerSchema, loginSchema, validateRequest } = require('../schema');
+>>>>>>> 7c7574c74a032b5aba05ecb0532be9a9259156be
 
 const router = express.Router();
 
 // Route pour l'inscription avec validation
+<<<<<<< HEAD
 router.post('/register', 
   validateRequest(registerSchema), 
   validateAdminFields, 
@@ -12,6 +17,11 @@ router.post('/register',
 );
 
 // Route pour la connexion (admin seulement)
+=======
+router.post('/register', validateRequest(registerSchema), (req, res) => authService.register(req, res));
+
+// Route pour la connexion avec validation
+>>>>>>> 7c7574c74a032b5aba05ecb0532be9a9259156be
 router.post('/login', validateRequest(loginSchema), (req, res) => authService.login(req, res));
 
 // Route pour voir tous les utilisateurs
