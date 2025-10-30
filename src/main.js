@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+console.log('🔍 MONGODB_URI:', process.env.MONGODB_URI); // ← AJOUTEZ CETTE LIGNE
 
 const { connectDB } = require('./config/db');
 const authRouter = require('./router/authRouter');

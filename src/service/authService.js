@@ -154,9 +154,10 @@ class AuthService {
     }
   }
 
-  async getProfile(req, res) {
+   async getProfile(req, res) {
     try {
-      // Note: Vous devrez implémenter le middleware d'authentification pour avoir req.user
+      console.log('👤 Récupération du profil pour:', req.user.id);
+      
       const user = await authRepository.findById(req.user.id);
       
       if (!user) {
@@ -166,9 +167,22 @@ class AuthService {
         });
       }
 
+      console.log('✅ Profil récupéré:', user.email);
+
       return res.json({
         success: true,
-        user: user
+        user: {
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          address: user.address,
+          city: user.city,
+          state: user.state,
+          isAdmin: user.isAdmin,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
+        }
       });
 
     } catch (error) {
@@ -176,6 +190,91 @@ class AuthService {
       return res.status(500).json({
         success: false,
         message: 'Erreur lors de la récupération du profil'
+      });
+    }
+  }
+
+  async updateProfile(req, res) {
+    try {
+      console.log('✏️ Mise à jour du profil pour:', req.user.id);
+      console.log('📝 Données reçues:', req.body);
+
+      const { firstName, lastName, address, city, state, currentPassword, newPassword } = req.body;
+
+      // Récupérer l'utilisateur actuel
+      const user = await authRepository.findByEmail(req.user.email);
+      
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'Utilisateur non trouvé'
+        });
+      }
+
+      // Si l'utilisateur veut changer son mot de passe
+      if (newPassword) {
+        if (!currentPassword) {
+          return res.status(400).json({
+            success: false,
+            message: 'Le mot de passe actuel est requis pour changer le mot de passe'
+          });
+        }
+
+        // Vérifier le mot de passe actuel
+        const isPasswordValid = await user.comparePassword(currentPassword);
+        if (!isPasswordValid) {
+          return res.status(401).json({
+            success: false,
+            message: 'Mot de passe actuel incorrect'
+          });
+        }
+
+        // Mettre à jour le mot de passe
+        user.password = newPassword;
+      }
+
+      // Mettre à jour les autres champs si fournis
+      if (firstName) user.firstName = firstName.trim();
+      if (lastName) user.lastName = lastName.trim();
+      if (address) user.address = address.trim();
+      if (city) user.city = city.trim();
+      if (state) user.state = state.trim();
+
+      // Sauvegarder les modifications
+      await user.save();
+
+      console.log('✅ Profil mis à jour avec succès:', user.email);
+
+      return res.json({
+        success: true,
+        message: 'Profil mis à jour avec succès ! 🎉',
+        user: {
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          address: user.address,
+          city: user.city,
+          state: user.state,
+          isAdmin: user.isAdmin,
+          updatedAt: user.updatedAt
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Erreur updateProfile:', error);
+      
+      if (error.name === 'ValidationError') {
+        const messages = Object.values(error.errors).map(err => err.message);
+        return res.status(400).json({
+          success: false,
+          message: messages.join(', ')
+        });
+      }
+      
+      return res.status(500).json({
+        success: false,
+        message: 'Erreur lors de la mise à jour du profil'
       });
     }
   }

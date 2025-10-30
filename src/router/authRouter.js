@@ -1,6 +1,7 @@
 const express = require('express');
 const authService = require('../service/authService');
-const { registerSchema, loginSchema, validateRequest } = require('../schema');
+const { registerSchema, updateProfileSchema, loginSchema, validateRequest } = require('../schema');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ router.post('/login', validateRequest(loginSchema), (req, res) => authService.lo
 router.get('/users', (req, res) => authService.getUsers(req, res));
 
 // Route pour récupérer le profil utilisateur
-router.get('/profile', (req, res) => authService.getProfile(req, res));
+router.get('/profile', authMiddleware, (req, res) => authService.getProfile(req, res));
+router.put('/profile', authMiddleware, validateRequest(updateProfileSchema), (req, res) => authService.updateProfile(req, res));
 
 module.exports = router;

@@ -82,6 +82,63 @@ const loginSchema = Joi.object({
       'string.empty': 'Le mot de passe est obligatoire'
     })
 });
+const updateProfileSchema = Joi.object({
+  firstName: Joi.string()
+    .min(2)
+    .max(50)
+    .messages({
+      'string.min': 'Le prénom doit contenir au moins 2 caractères',
+      'string.max': 'Le prénom ne peut pas dépasser 50 caractères'
+    }),
+  
+  lastName: Joi.string()
+    .min(2)
+    .max(50)
+    .messages({
+      'string.min': 'Le nom doit contenir au moins 2 caractères',
+      'string.max': 'Le nom ne peut pas dépasser 50 caractères'
+    }),
+  
+  address: Joi.string()
+    .min(5)
+    .max(200)
+    .messages({
+      'string.min': 'L\'adresse doit contenir au moins 5 caractères'
+    }),
+  
+  city: Joi.string()
+    .min(2)
+    .max(100)
+    .messages({
+      'string.min': 'La ville doit contenir au moins 2 caractères'
+    }),
+  
+  state: Joi.string()
+    .min(2)
+    .max(50)
+    .messages({
+      'string.min': 'Le département/état doit contenir au moins 2 caractères'
+    }),
+  
+  currentPassword: Joi.string()
+    .min(6)
+    .messages({
+      'string.min': 'Le mot de passe actuel doit contenir au moins 6 caractères'
+    }),
+  
+  newPassword: Joi.string()
+    .min(6)
+    .messages({
+      'string.min': 'Le nouveau mot de passe doit contenir au moins 6 caractères'
+    })
+}).custom((value, helpers) => {
+  if (value.newPassword && !value.currentPassword) {
+    return helpers.error('any.custom', {
+      message: 'Le mot de passe actuel est requis pour changer le mot de passe'
+    });
+  }
+  return value;
+});
 
 // Middleware de validation
 const validateRequest = (schema) => {
@@ -108,5 +165,6 @@ const validateRequest = (schema) => {
 module.exports = {
   registerSchema,
   loginSchema,
+  updateProfileSchema,
   validateRequest
 };
